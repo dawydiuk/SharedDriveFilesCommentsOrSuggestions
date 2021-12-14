@@ -8,7 +8,7 @@ To use this script
 <ol>
   <li>Rename emailExample.gs to a more intuitive name for your application, you can copy this file if you want different emails for different shared drives.
   </li>
-  <li>Edit emailExample.gs and set the to, replyTo, and subject variables for the resulting email and edit the variable q to<br /> 
+  <li>Edit emailExample.gs and set the to, replyTo, and subject variables for the resulting email.<br /> 
     <br />    
 
 ```
@@ -21,7 +21,7 @@ To use this script
     
   </li>
   
-  <li> Edit emailExample.gs and set the to, replyTo, and subject variables for the resulting email and edit the variable q to. 
+  <li> Edit emailExample.gs and set the q variable to specify what shared drives this script should parse. 
     <br />See <a href=https://developers.google.com/drive/api/v3/search-shareddrives?authuser=2>Search for shared drives</a> documentation for syntax<br /><br /> 
 
 ``` 
