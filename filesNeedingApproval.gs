@@ -7,6 +7,12 @@ function getfilesNeedingApprovalInfo(sharedDrives)
 {
   var body = "<small>This email contains a list of Google docs that have open comments or suggested edits</small><br />\n"  
 
+  if(sharedDrives == null) 
+  {
+    Logger.log("Nothing to do sharedDrives is empty");
+    return;
+  }
+
   for (var i = 0; i < sharedDrives.length; i++)
   {
     Logger.log("->%s", sharedDrives[i].name)
@@ -86,15 +92,7 @@ function getFilesNeedApproval(folder, filesNeedApproval, errors) {
  ********************************************************************************************/
 function needsApproval(file)
 {
-  try 
-  {
-    comments = Drive.Comments.list(file.getId())
-  }catch(err)
-  {
-    throw("An error occured while attempting to check for comments on file [%s] error was: [%s]", file, err)
-  }
-  
-  if((comments.items.length > 0) || hasSuggestedEdits(file))
+  if(hasUnresolvedComments(file) || hasSuggestedEdits(file))
     return true
   
   return false
@@ -105,7 +103,6 @@ function needsApproval(file)
  ********************************************************************************************/
 function getSharedDrives(q) 
 {
-  
   var pageToken
   var sharedDrives = []
   
@@ -119,6 +116,11 @@ function getSharedDrives(q)
     
   } while(pageToken)
 
+  if(sharedDrives)
+    Logger.log("query [" + q + "] returned %d shared drives.", sharedDrives.length);
+  else
+    Logger.log("query [" + q + "] didn't return any shared drives. Nothing to do!");
+  
   return sharedDrives;
 }
 
@@ -131,8 +133,6 @@ function getSharedDrives(q)
  ********************************************************************************************/
 function hasSuggestedEdits(file)
 {
-
-  //if(file.getMimeType() == MimeType.GOOGLE_DOCS)
   if(file.getMimeType() == "application/vnd.google-apps.document")
   {
     var doc = Docs.Documents.get(file.getId())
@@ -161,6 +161,31 @@ function hasSuggestedEdits(file)
       }
     }
   } 
+  return false
+}
+
+
+/********************************************************************************************
+ * Google Docs type documents are checked for unresloved comments. Returns true if there are
+ *  any unresolved comments, else false
+ ********************************************************************************************/
+function hasUnresolvedComments(file)
+{
+  //if not a Google Doc don't check for comments
+  if(file.getMimeType() != "application/vnd.google-apps.document")
+    return false
+
+  comments = Drive.Comments.list(file.getId())
+  if(!comments || comments.length == 0)
+    return false
+     
+  for(var i = 0; i < comments.items.length; i++)
+    if(comments.items[i].status == "open")
+    {
+      Logger.log("Open comment found: " + comments.items[i])
+      return true
+    }
+   
   return false
 }
 
